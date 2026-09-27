@@ -1,0 +1,5 @@
+DirectoryIndex login.html
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

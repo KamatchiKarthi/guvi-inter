@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GUVI Internship | Profile</title>
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="profile.html">
+                <img src="assets/logo.svg" alt="" class="brand-logo">
+                GUVI Internship
+            </a>
+            <button type="button" id="logoutButton" class="btn btn-outline-light btn-sm">Logout</button>
+        </div>
+    </nav>
+
+    <main class="page-main">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
+                    <div class="card app-card">
+                        <div class="card-body">
+                            <div id="profileAlert" class="alert d-none" role="alert" aria-live="polite"></div>
+
+                            <div id="profileLoading" class="text-center py-5">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Loading profile...</span>
+                                </div>
+                            </div>
+
+                            <div id="profileContent" class="d-none">
+                                <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mb-4 text-center text-sm-start">
+                                    <div id="profileAvatar"
+                                        class="profile-avatar rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold"
+                                        aria-hidden="true"></div>
+                                    <div>
+                                        <h1 id="profileName" class="h4 mb-1"></h1>
+                                        <p id="profileEmail" class="text-muted mb-0"></p>
+                                    </div>
+                                </div>
+
+                                <section id="profileView" aria-labelledby="profileViewHeading">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                                        <h2 id="profileViewHeading" class="h5 mb-0">Profile details</h2>
+                                        <button type="button" id="editProfileButton" class="btn btn-success btn-sm">
+                                            Edit profile
+                                        </button>
+                                    </div>
+
+                                    <dl class="row profile-details mb-0">
+                                        <dt class="col-sm-4">Age</dt>
+                                        <dd id="viewAge" class="col-sm-8"></dd>
+
+                                        <dt class="col-sm-4">Date of birth</dt>
+                                        <dd id="viewDob" class="col-sm-8"></dd>
+
+                                        <dt class="col-sm-4">Contact number</dt>
+                                        <dd id="viewContact" class="col-sm-8"></dd>
+
+                                        <dt class="col-sm-4">Address</dt>
+                                        <dd id="viewAddress" class="col-sm-8 profile-multiline-value"></dd>
+                                    </dl>
+                                </section>
+
+                                <section id="profileEditSection" class="d-none" aria-labelledby="profileEditHeading">
+                                    <h2 id="profileEditHeading" class="h5 mb-3">Edit profile</h2>
+
+                                    <form id="profileForm" novalidate>
+                                        <div class="row g-3">
+                                            <div class="col-12 col-sm-6">
+                                                <label for="age" class="form-label">Age</label>
+                                                <input type="text" id="age" class="form-control" placeholder="Enter your age"
+                                                    maxlength="3" inputmode="numeric" aria-describedby="ageError">
+                                                <div id="ageError" class="invalid-feedback"></div>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <label for="dob" class="form-label">Date of birth</label>
+                                                <input type="date" id="dob" class="form-control" autocomplete="bday"
+                                                    aria-describedby="dobError">
+                                                <div id="dobError" class="invalid-feedback"></div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <label for="contact" class="form-label">Contact number</label>
+                                                <input type="tel" id="contact" class="form-control"
+                                                    placeholder="Enter your contact number" maxlength="20" autocomplete="tel"
+                                                    aria-describedby="contactHint contactError">
+                                                <div id="contactHint" class="form-text">10-15 digits, may start with +.</div>
+                                                <div id="contactError" class="invalid-feedback"></div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <label for="address" class="form-label">Address</label>
+                                                <textarea id="address" class="form-control address-input" rows="3"
+                                                    placeholder="Enter your address" maxlength="255"
+                                                    autocomplete="street-address" aria-describedby="addressError"></textarea>
+                                                <div id="addressError" class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-column-reverse flex-sm-row justify-content-sm-end gap-2 mt-4">
+                                            <button type="button" id="cancelEditButton" class="btn btn-outline-secondary">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" id="saveProfileButton" class="btn btn-success">
+                                                Save profile
+                                            </button>
+                                        </div>
+                                    </form>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>

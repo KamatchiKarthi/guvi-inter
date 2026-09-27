@@ -1,0 +1,72 @@
+:root {
+    --app-background: #f3f6f9;
+    --app-card-radius: 1rem;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--app-background);
+}
+
+.brand-logo {
+    width: 2rem;
+    height: 2rem;
+}
+
+.page-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 0.75rem;
+}
+
+.app-card {
+    border: 0;
+    border-radius: var(--app-card-radius);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+}
+
+.app-card .card-body {
+    padding: 1.5rem;
+}
+
+.profile-avatar {
+    width: 4.5rem;
+    height: 4.5rem;
+    font-size: 1.75rem;
+}
+
+.address-input {
+    resize: vertical;
+}
+
+.profile-details dt {
+    color: var(--bs-secondary-color);
+    font-weight: 600;
+}
+
+.profile-details dd {
+    overflow-wrap: anywhere;
+}
+
+.profile-multiline-value {
+    white-space: pre-line;
+}
+
+@media (min-width: 768px) {
+    .page-main {
+        padding: 3rem 1.5rem;
+    }
+
+    .app-card .card-body {
+        padding: 2.5rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .app-card .card-body {
+        padding: 3rem;
+    }
+}
