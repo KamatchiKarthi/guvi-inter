@@ -10,9 +10,4 @@ if (preg_match('#(^|/)\.#', $requestPath) === 1) {
     return true;
 }
 
-if ($requestPath === '/') {
-    header('Location: /login.html', true, 302);
-    return true;
-}
-
 return false;

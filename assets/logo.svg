@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="logoTitle">
-  <title id="logoTitle">GUVI Internship</title>
+  <title id="logoTitle">User Portal</title>
   <circle cx="32" cy="32" r="30" fill="#198754"/>
-  <path d="M44 24a14 14 0 1 0 2 14H33v-7h13" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="32" cy="24" r="9" fill="#ffffff"/>
+  <path d="M15 49c2-9 9-14 17-14s15 5 17 14" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
 </svg>

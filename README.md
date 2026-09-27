@@ -1,4 +1,4 @@
-# GUVI Internship App
+# User Portal
 
 Register → Login → Profile, built with HTML, CSS (Bootstrap 5), jQuery AJAX, PHP, MySQL and Redis.
 
@@ -10,10 +10,10 @@ css/           style.css
 js/            common.js, validation.js, login.js, profile.js, register.js
 php/           config.php, router.php, login.php, profile.php, register.php
 sql/           schema.sql
-login.html  profile.html  register.html
+index.html  login.html  profile.html  register.html
 ```
 
-The site opens on the login page (`/` redirects to `login.html`).
+`index.html` forwards visitors to the login page.
 
 ## How it works
 
