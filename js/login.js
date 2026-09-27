@@ -1,4 +1,10 @@
+/*
+ * Login page: validates the form, sends the credentials with jQuery AJAX
+ * and stores the returned session token in localStorage.
+ */
+
 $(function () {
+    // Already logged in: skip straight to the profile page.
     if (getStoredSession()) {
         window.location.replace('profile.html');
         return;
@@ -13,6 +19,8 @@ $(function () {
         password: validatePasswordLength
     });
 
+    // Handles both the button click and the Enter key; preventDefault stops the browser's
+    // own form submission, so data is only ever sent through $.ajax.
     $loginForm.on('submit', function (event) {
         event.preventDefault();
         hideAlert($loginAlert);

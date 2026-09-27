@@ -1,9 +1,16 @@
+/*
+ * Form validation used by the register, login and profile pages.
+ * Each validateX function takes the raw input value and returns an error message, or '' when valid.
+ * Optional profile fields return '' when left empty.
+ */
+
 const FULL_NAME_MIN_LENGTH = 2;
 const FULL_NAME_MAX_LENGTH = 100;
 const FULL_NAME_PATTERN = /^\p{L}[\p{L} .'-]*$/u;
 const EMAIL_MAX_LENGTH = 255;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_MIN_LENGTH = 8;
+// PHP's password_hash (bcrypt) ignores everything after 72 bytes, so longer passwords are rejected.
 const PASSWORD_MAX_BYTES = 72;
 const AGE_MIN = 1;
 const AGE_MAX = 120;
@@ -15,6 +22,7 @@ const CONTACT_MAX_LENGTH = 20;
 const ADDRESS_MIN_LENGTH = 5;
 const ADDRESS_MAX_LENGTH = 255;
 
+// Measures password length in UTF-8 bytes, the unit bcrypt uses.
 const passwordEncoder = new TextEncoder();
 
 function validateFullName(fullNameInput) {
@@ -45,6 +53,7 @@ function validateEmail(emailInput) {
     return '';
 }
 
+// Login only checks length; the strength rules apply when a password is created (validateNewPassword).
 function validatePasswordLength(password) {
     if (password === '') {
         return 'Password is required.';
@@ -74,6 +83,7 @@ function validateConfirmPassword(password, confirmPassword) {
     return password === confirmPassword ? '' : 'Passwords do not match.';
 }
 
+// Today at local midnight, so date comparisons ignore the current time of day.
 function getToday() {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -85,6 +95,7 @@ function toIsoDate(date) {
     return date.getFullYear() + '-' + month + '-' + day;
 }
 
+// Returns null for impossible dates such as 2024-02-31, which new Date() would silently roll over to March.
 function parseIsoDate(dateInput) {
     if (!ISO_DATE_PATTERN.test(dateInput)) {
         return null;
@@ -94,6 +105,7 @@ function parseIsoDate(dateInput) {
     return toIsoDate(parsedDate) === dateInput ? parsedDate : null;
 }
 
+// Age in whole years; one year less if this year's birthday has not happened yet.
 function calculateAge(dateOfBirth) {
     const today = getToday();
     const hadBirthdayThisYear = today.getMonth() > dateOfBirth.getMonth()
@@ -131,6 +143,7 @@ function validateDateOfBirth(dobInput) {
     return '';
 }
 
+// Only compared when both fields are filled in and individually valid, so the user sees one error at a time.
 function validateAgeMatchesDateOfBirth(ageInput, dobInput) {
     const age = ageInput.trim();
     const dob = dobInput.trim();
@@ -164,7 +177,12 @@ function validateAddress(addressInput) {
     return '';
 }
 
-// Each field needs a matching "<fieldId>Error" element to show its message.
+/**
+ * Wires inline Bootstrap validation to a form. fieldValidators maps input ids to validateX functions.
+ * Each field needs a matching "<fieldId>Error" element to show its message.
+ * A field's error first appears when the user leaves it (blur), then updates live while typing,
+ * so users are not warned before they have finished entering a value.
+ */
 function createFormValidator(fieldValidators) {
     const fieldIds = Object.keys(fieldValidators);
 
@@ -217,6 +235,7 @@ function createFormValidator(fieldValidators) {
             }
         },
 
+        // Shows field errors returned by PHP (e.g. "email already exists"); returns false when there are none.
         showServerErrors: function (jqXHR) {
             const serverErrors = (jqXHR.responseJSON && jqXHR.responseJSON.errors) || {};
             const erroredFieldIds = Object.keys(serverErrors).filter(function (fieldId) {

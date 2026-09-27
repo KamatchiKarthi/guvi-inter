@@ -1,8 +1,14 @@
+/*
+ * Small additions on top of Bootstrap 5; layout and form styling come from Bootstrap classes in the HTML.
+ * Mobile-first: base rules target phones, media queries add space on larger screens.
+ */
+
 :root {
     --app-background: #f3f6f9;
     --app-card-radius: 1rem;
 }
 
+/* Full-height column so the card stays vertically centred below the navbar. */
 body {
     min-height: 100vh;
     display: flex;
@@ -47,10 +53,12 @@ body {
     font-weight: 600;
 }
 
+/* Long emails or addresses without spaces wrap instead of overflowing on small screens. */
 .profile-details dd {
     overflow-wrap: anywhere;
 }
 
+/* Keeps the line breaks the user typed in the address. */
 .profile-multiline-value {
     white-space: pre-line;
 }

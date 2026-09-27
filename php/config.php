@@ -2,12 +2,22 @@
 
 declare(strict_types=1);
 
+/**
+ * Shared setup included by every endpoint: loads .env, opens the MySQL and Redis
+ * connections, and provides the JSON response and session-token helpers.
+ */
+
+// Sessions expire after 1 hour of inactivity; every profile request resets the timer.
 const SESSION_TTL_SECONDS = 3600;
 const SESSION_KEY_PREFIX = 'guvi:session:';
 const SESSION_TOKEN_PATTERN = '/^[a-f0-9]{64}$/';
 const MYSQL_DUPLICATE_ENTRY_CODE = 1062;
 const ENV_FILE_PATH = __DIR__ . '/../.env';
 
+/**
+ * Reads KEY=VALUE lines from .env into the process environment.
+ * Blank lines and lines starting with # are ignored.
+ */
 function loadEnvironmentFile(string $filePath): void
 {
     if (!is_readable($filePath)) {
@@ -30,6 +40,10 @@ function loadEnvironmentFile(string $filePath): void
 
 loadEnvironmentFile(ENV_FILE_PATH);
 
+/**
+ * Falls back to $defaultValue when the variable is missing or empty,
+ * so a local setup works without every key in .env.
+ */
 function readEnvironment(string $name, string $defaultValue): string
 {
     $value = getenv($name);
@@ -37,6 +51,10 @@ function readEnvironment(string $name, string $defaultValue): string
     return ($value === false || $value === '') ? $defaultValue : $value;
 }
 
+/**
+ * Every endpoint responds with { success, message, data?, errors? }.
+ * Execution stops here, so nothing runs after a response is sent.
+ */
 function sendJson(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -50,6 +68,10 @@ function sendError(int $statusCode, string $message): void
     sendJson($statusCode, ['success' => false, 'message' => $message]);
 }
 
+/**
+ * Keys of $fieldErrors must match the input ids on the page, so the frontend
+ * can show each message under its field (see showServerErrors in js/validation.js).
+ */
 function sendFieldErrors(int $statusCode, array $fieldErrors): void
 {
     sendJson($statusCode, [
@@ -59,11 +81,16 @@ function sendFieldErrors(int $statusCode, array $fieldErrors): void
     ]);
 }
 
+// Database/Redis failures are logged on the server; the browser only gets a generic
+// message so connection details and SQL errors are never exposed.
 set_exception_handler(static function (Throwable $exception): void {
     error_log($exception->getMessage());
     sendError(500, 'Server error. Please try again later.');
 });
 
+/**
+ * All endpoints accept POST only, so passwords and tokens never appear in URLs or access logs.
+ */
 function requirePostRequest(): void
 {
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -72,6 +99,9 @@ function requirePostRequest(): void
     }
 }
 
+/**
+ * Always returns a string; arrays such as email[]=x are treated as empty input.
+ */
 function readPostValue(string $field): string
 {
     $value = $_POST[$field] ?? '';
@@ -79,6 +109,10 @@ function readPostValue(string $field): string
     return is_string($value) ? $value : '';
 }
 
+/**
+ * Strict reporting turns every MySQL error into an exception, which the handler above catches.
+ * Set DB_SSL=true for hosted databases (e.g. Aiven) that require encrypted connections.
+ */
 function getDatabaseConnection(): mysqli
 {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -111,6 +145,9 @@ function getDatabaseConnection(): mysqli
     return $connection;
 }
 
+/**
+ * REDIS_PASSWORD is optional: a local Redis usually has none, hosted Redis (e.g. Redis Cloud) requires one.
+ */
 function getRedisConnection(): Redis
 {
     $redis = new Redis();
@@ -127,11 +164,18 @@ function getRedisConnection(): Redis
     return $redis;
 }
 
+/**
+ * Redis layout: "<prefix><token>" => user id. The prefix keeps session keys
+ * grouped and separate from any other data in the same Redis database.
+ */
 function buildSessionKey(string $token): string
 {
     return SESSION_KEY_PREFIX . $token;
 }
 
+/**
+ * Rejects malformed tokens before Redis is queried.
+ */
 function isValidSessionToken(string $token): bool
 {
     return preg_match(SESSION_TOKEN_PATTERN, $token) === 1;

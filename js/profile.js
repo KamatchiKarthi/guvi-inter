@@ -1,7 +1,13 @@
+/*
+ * Profile page: loads the profile using the token from localStorage, switches between
+ * the read-only view and the edit form, saves changes and handles logout.
+ */
+
 const HTTP_UNAUTHORIZED = 401;
 const EMPTY_VALUE_TEXT = 'Not provided';
 
 $(function () {
+    // Not logged in: this page needs a session token.
     const session = getStoredSession();
     if (!session) {
         window.location.replace('login.html');
@@ -20,8 +26,10 @@ $(function () {
     const $logoutButton = $('#logoutButton');
     const $dob = $('#dob');
 
+    // Last profile loaded from the server; used to refill the form when editing starts.
     let currentProfile = null;
 
+    // Age is also checked against the date of birth, so it is re-validated whenever dob changes.
     const profileValidator = createFormValidator({
         age: function (ageInput) {
             return validateAge(ageInput) || validateAgeMatchesDateOfBirth(ageInput, $dob.val());
@@ -40,6 +48,7 @@ $(function () {
         window.location.replace('login.html');
     }
 
+    // Every profile.php call sends the action plus the session token for Redis to verify.
     function requestProfile(action, extraFields) {
         return $.ajax({
             url: 'php/profile.php',
@@ -49,6 +58,7 @@ $(function () {
         });
     }
 
+    // 401 means the Redis session expired or was deleted, so the stale local token is cleared.
     function handleRequestFailure(jqXHR) {
         if (jqXHR.status === HTTP_UNAUTHORIZED) {
             redirectToLogin();
@@ -120,6 +130,8 @@ $(function () {
         showProfileView();
     });
 
+    // Handles both the button click and the Enter key; preventDefault stops the browser's
+    // own form submission, so data is only ever sent through $.ajax.
     $profileForm.on('submit', function (event) {
         event.preventDefault();
         hideAlert($profileAlert);
@@ -149,6 +161,7 @@ $(function () {
             });
     });
 
+    // The local session is cleared even if the request fails, so the user is never stuck logged in.
     $logoutButton.on('click', function () {
         setButtonLoading($logoutButton, true, 'Logging out...');
         requestProfile('logout', {}).always(redirectToLogin);

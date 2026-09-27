@@ -2,8 +2,20 @@
 
 declare(strict_types=1);
 
+/**
+ * POST php/profile.php
+ * Params: token, action = fetch | update | logout
+ *         update also takes age, dob, contact, address (all optional)
+ * 200 success | 401 session missing or expired | 400 unknown action
+ * The token from localStorage is checked against Redis on every request.
+ */
+
 require __DIR__ . '/config.php';
 
+/**
+ * LEFT JOIN so users who have never saved profile details still load;
+ * their profile fields come back as null.
+ */
 function fetchProfile(mysqli $connection, int $userId): ?array
 {
     $statement = $connection->prepare(
@@ -32,11 +44,17 @@ function fetchProfile(mysqli $connection, int $userId): ?array
     ];
 }
 
+/**
+ * Cleared optional fields are stored as NULL rather than empty strings.
+ */
 function nullIfEmpty(string $value): ?string
 {
     return $value === '' ? null : $value;
 }
 
+/**
+ * Upsert: creates the user's profile row on the first save and updates it afterwards.
+ */
 function updateProfile(mysqli $connection, int $userId): void
 {
     $ageInput = trim(readPostValue('age'));
@@ -84,6 +102,7 @@ if ($action === 'logout') {
     sendJson(200, ['success' => true, 'message' => 'Logged out successfully.']);
 }
 
+// Sliding expiry: any activity keeps the session alive for another SESSION_TTL_SECONDS.
 $redis->expire($sessionKey, SESSION_TTL_SECONDS);
 $connection = getDatabaseConnection();
 
@@ -98,6 +117,7 @@ if ($action === 'update') {
 
 if ($action === 'fetch') {
     $profile = fetchProfile($connection, $userId);
+    // The account was removed while its session was still active, so the session is dropped too.
     if ($profile === null) {
         $redis->del($sessionKey);
         sendError(401, 'Account not found. Please log in again.');

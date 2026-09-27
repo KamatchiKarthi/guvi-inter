@@ -2,8 +2,16 @@
 
 declare(strict_types=1);
 
+/**
+ * POST php/login.php
+ * Params: email, password
+ * 200 { token, fullName } | 401 invalid credentials
+ * The token is stored in Redis on the server and in localStorage in the browser.
+ */
+
 require __DIR__ . '/config.php';
 
+// 32 random bytes = 64 hex characters, matching SESSION_TOKEN_PATTERN.
 const SESSION_TOKEN_BYTES = 32;
 
 requirePostRequest();
@@ -19,6 +27,7 @@ $statement->bind_param('s', $email);
 $statement->execute();
 $user = $statement->get_result()->fetch_assoc();
 
+// One message for both cases, so nobody can use this form to find out which emails are registered.
 if ($user === null || !password_verify($password, $user['password_hash'])) {
     sendError(401, 'Invalid email or password.');
 }

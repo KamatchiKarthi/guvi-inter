@@ -1,6 +1,13 @@
+/*
+ * Register page: validates the form, creates the account with jQuery AJAX,
+ * then sends the user to the login page.
+ */
+
+// Gives the user time to read the success message before moving to the login page.
 const LOGIN_REDIRECT_DELAY_MS = 1500;
 
 $(function () {
+    // Already logged in: skip straight to the profile page.
     if (getStoredSession()) {
         window.location.replace('profile.html');
         return;
@@ -20,10 +27,13 @@ $(function () {
         }
     });
 
+    // Re-check "confirm password" when the password changes, so a stale mismatch error does not linger.
     $password.on('input', function () {
         registerValidator.revalidateIfTouched('confirmPassword');
     });
 
+    // Handles both the button click and the Enter key; preventDefault stops the browser's
+    // own form submission, so data is only ever sent through $.ajax.
     $registerForm.on('submit', function (event) {
         event.preventDefault();
         hideAlert($registerAlert);
